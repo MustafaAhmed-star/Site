@@ -20,4 +20,4 @@ class Post(models.Model):
             models.Index(fields=['-publish'])
         ]
     def __str__(self):
-        return self.title
+        return self.title  
