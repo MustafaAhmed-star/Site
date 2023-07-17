@@ -9,8 +9,13 @@ def post_list(request):
     }
     return render(request,'nblog/post/list.html',context=context)
 
-def post_detail(request,id):
-    post=get_object_or_404(Post,id=id,status=Post.Status.PUBLISHED)
+def post_detail(request,year,month,day,post):
+    post=get_object_or_404(Post,
+                           status=Post.Status.PUBLISHED,
+                           slug=post,
+                           publish__year=year,
+                           publish__month=month,
+                           publish__day=day,)
     context={
         'post':post,
     }
