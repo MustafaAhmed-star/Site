@@ -1,12 +1,13 @@
 from django.shortcuts import render,get_object_or_404
-from .models import Post
+from .models import Post,Comment
 from django.http import Http404
 from django.core.paginator import Paginator,EmptyPage,\
                                                         PageNotAnInteger
 from django.views.generic import ListView
-##
-from .forms import EmailPostForm
+ 
+from .forms import EmailPostForm ,CommentForm
 from django.core.mail import send_mail
+from django.views.decorators.http import require_POST
 # Create your views here.
 """
 def post_list(request):
@@ -30,15 +31,21 @@ class PostListView(ListView):
     context_object_name='posts'
     paginate_by=3
     template_name='nblog/post/list.html'
-def post_detail(request,year,month,day,post):
-    post=get_object_or_404(Post,
-                           status=Post.Status.PUBLISHED,
-                           slug=post,
-                           publish__year=year,
-                           publish__month=month,
-                           publish__day=day,)
+def post_detail(request, year, month, day, post):
+    post = get_object_or_404(Post,
+                             status=Post.Status.PUBLISHED,
+                             slug=post,
+                             publish__year=year,
+                             publish__month=month,
+                             publish__day=day)
+    # List of active comments for this post
+    comments = post.comments.filter(active=True)
+    # Form for users to comment
+    form = CommentForm()
     context={
         'post':post,
+        'comments': comments,
+        'form': form,
     }
     
     return render(request,'nblog/post/detail.html',context=context)
@@ -67,3 +74,22 @@ def post_share(request, post_id):
         'sent': sent,
     }
     return render(request, 'nblog/post/share.html', context=context)
+
+
+@require_POST
+def post_comment(request,post_id):
+    post=get_object_or_404(Post,
+                           id=post_id,
+                           status=Post.Status.PUBLISHED)
+    comment=None
+    form=CommentForm(data=request.POST)
+    if form.is_valid():
+        comment=form.save(commit=False)
+        comment.post=post
+        comment.save()
+    context = {
+        'post': post,
+        'form': form,
+        'comment': comment,
+    }
+    return render(request,'nblog/post/comment.html',context=context)
