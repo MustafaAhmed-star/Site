@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "nblog.apps.NblogConfig" ,
+    "nblog.apps.NblogConfig",
+    'taggit',
 ]
 
 MIDDLEWARE = [
