@@ -26,7 +26,8 @@ SECRET_KEY = "django-insecure-#qs^zg82qq$p$!g57*g)pkpx#ne9s(^#tr-^_e8p2ha7n4(u!z
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+#site id to add sitemap
+SITE_ID= 1
 
 # Application definition
 
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "nblog.apps.NblogConfig",
     'taggit',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
 ]
 
 MIDDLEWARE = [
