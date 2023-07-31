@@ -10,8 +10,8 @@ from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from taggit.models import Tag
 from django.db.models import Count
-from django.contrib.postgres.search import SearchVector
-# Create your views here.
+from django.contrib.postgres.search import SearchVector, \
+                                           SearchQuery, SearchRank# Create your views here.
 def post_list(request, tag_slug=None):
     post_list = Post.published.all()
     tag = None
@@ -133,9 +133,13 @@ def post_search(request):
         form= SearchForm(request.GET)
         if form.is_valid():
             query=form.cleaned_data['query']
+            search_vector = SearchVector('title',weight='A')+\
+                            SearchVector('body', weight='B')
+            search_query = SearchQuery(query)
+
             results= Post.published.annotate(
-                search=SearchVector('title', 'body'),
-                    ).filter(search=query)
+                search=search_vector,rank=SearchRank(search_vector,search_query)
+                    ).filter(rank__gte=0.3).order_by('-rank')
     context={
         'form': form,
         'query': query,
